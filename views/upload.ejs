@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Upload Track</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white shadow-md rounded-lg p-8 max-w-lg w-full">
+        <h1 class="text-2xl font-semibold text-center mb-6">Upload Your Track</h1>
+
+        <form
+            action="/music/upload"
+            method="POST"
+            enctype="multipart/form-data"
+            class="space-y-4"
+        >
+            <!-- Track Title -->
+            <div>
+                <label
+                    for="title"
+                    class="block text-sm font-medium text-gray-700"
+                >Track Title</label>
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Enter track title"
+                    required
+                >
+            </div>
+
+            <!-- Year -->
+            <div>
+                <label
+                    for="year"
+                    class="block text-sm font-medium text-gray-700"
+                >Year</label>
+                <input
+                    type="number"
+                    id="year"
+                    name="year"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Enter release year"
+                    required
+                >
+            </div>
+
+            <!-- Duration -->
+            <div>
+                <label
+                    for="duration"
+                    class="block text-sm font-medium text-gray-700"
+                >Duration (in seconds)</label>
+                <input
+                    type="number"
+                    id="duration"
+                    name="duration"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Enter track duration"
+                    required
+                >
+            </div>
+
+            <!-- Album -->
+            <div>
+                <label
+                    for="album"
+                    class="block text-sm font-medium text-gray-700"
+                >Album Name</label>
+                <input
+                    type="text"
+                    id="album"
+                    name="album"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Enter album name"
+                >
+            </div>
+
+            <!-- Track File -->
+            <div>
+                <label
+                    for="track"
+                    class="block text-sm font-medium text-gray-700"
+                >Upload Track</label>
+                <input
+                    type="file"
+                    id="track"
+                    name="track"
+                    class="mt-1 block w-full px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    accept="audio/*"
+                    required
+                >
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button
+                    type="submit"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    Upload Track
+                </button>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>
