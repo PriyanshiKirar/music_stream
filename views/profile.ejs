@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title><%= user.username %>'s Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <header class="bg-indigo-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Music App</h1>
+            <nav>
+                <a
+                    href="/"
+                    class="text-white hover:text-indigo-200 mr-4"
+                >Home</a>
+                <a
+                    href="/logout"
+                    class="bg-white text-indigo-600 px-4 py-2 rounded hover:bg-indigo-100"
+                >Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto mt-8 px-4">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-3xl font-bold mb-4"><%= user.username %>'s Profile</h2>
+            <p class="text-gray-600">Email: <%= user.email %></p>
+            <p class="text-gray-600">Member since: <%= user.createdAt.toDateString() %></p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-2xl font-bold mb-4">Favorite Tracks</h3>
+                <% if (user.favorites && user.favorites.length > 0) { %>
+                <ul class="space-y-4">
+                    <% user.favorites.forEach(track => { %>
+                    <li class="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+                        <div>
+                            <h4 class="text-xl font-semibold"><%= track.title %></h4>
+                            <p class="text-gray-600"><%= track.artist.username %></p>
+                        </div>
+                        <button
+                            onclick="playTrack('<%= track.url %>', '<%= track.title %>', '<%= track.artist.username %>')"
+                            class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition duration-300"
+                        >
+                            Play
+                        </button>
+                    </li>
+                    <% }) %>
+                </ul>
+                <% } else { %>
+                <p class="text-gray-600">You haven't added any favorite tracks yet.</p>
+                <% } %>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-2xl font-bold mb-4">Playlists</h3>
+                <form
+                    action="/user/playlist/create"
+                    method="POST"
+                    class="mb-6"
+                >
+                    <div class="flex items-center">
+                        <input
+                            type="text"
+                            name="playlistName"
+                            placeholder="New playlist name"
+                            required
+                            class="flex-grow mr-2 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        >
+                        <button
+                            type="submit"
+                            class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition duration-300"
+                        >
+                            Create Playlist
+                        </button>
+                    </div>
+                </form>
+                <% if (user.playlists && user.playlists.length > 0) { %>
+                <ul class="space-y-4">
+                    <% user.playlists.forEach(playlist => { %>
+                    <li class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="text-xl font-semibold mb-2"><%= playlist.title %></h4>
+                        <p class="text-gray-600 mb-2"><%= playlist.tracks.length %> tracks</p>
+                        <a
+                            href="/user/playlist/<%= playlist._id %>"
+                            class="text-indigo-600 hover:text-indigo-800"
+                        >View Playlist</a>
+                    </li>
+                    <% }) %>
+                </ul>
+                <% } else { %>
+                <p class="text-gray-600">You haven't created any playlists yet.</p>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <div
+        id="player"
+        class="fixed bottom-0 left-0 right-0 bg-white shadow-md p-4 hidden"
+    >
+        <div class="container mx-auto flex items-center justify-between">
+            <div>
+                <h4
+                    id="nowPlaying"
+                    class="text-lg font-semibold"
+                ></h4>
+                <p
+                    id="artistName"
+                    class="text-gray-600"
+                ></p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button
+                    id="playPauseBtn"
+                    onclick="togglePlayPause()"
+                    class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition duration-300"
+                >
+                    Pause
+                </button>
+                <input
+                    type="range"
+                    id="volumeSlider"
+                    min="0"
+                    max="100"
+                    value="100"
+                    class="w-32"
+                >
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sound;
+        let isPlaying = false;
+
+        function playTrack(url, title, artist) {
+            if (sound) {
+                sound.unload();
+            }
+
+            sound = new Howl({
+                src: [ url ],
+                html5: true,
+                volume: 1.0
+            });
+
+            sound.play();
+            isPlaying = true;
+            document.getElementById('nowPlaying').textContent = `Now Playing: ${title}`;
+            document.getElementById('artistName').textContent = artist;
+            document.getElementById('playPauseBtn').textContent = 'Pause';
+            document.getElementById('player').classList.remove('hidden');
+        }
+
+        function togglePlayPause() {
+            if (sound) {
+                if (isPlaying) {
+                    sound.pause();
+                    document.getElementById('playPauseBtn').textContent = 'Play';
+                } else {
+                    sound.play();
+                    document.getElementById('playPauseBtn').textContent = 'Pause';
+                }
+                isPlaying = !isPlaying;
+            }
+        }
+
+        document.getElementById('volumeSlider').addEventListener('input', function (e) {
+            if (sound) {
+                sound.volume(e.target.value / 100);
+            }
+        });
+    </script>
+</body>
+</html>

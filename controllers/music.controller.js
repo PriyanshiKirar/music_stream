@@ -1,11 +1,12 @@
-const Track = require('../models/track..model'); // Assuming you have a Track model
+const Track = require('../models/track..model.js'); // Assuming you have a Track model
+const Playlist = require('../models/playlist.js');
 
 // Controller to handle track upload
 exports.uploadTrack = async (req, res) => {
     try {
         const { title, year, album, duration } = req.body;
         const artist = req.user.username; // Assuming the artist is the logged-in user
-        const trackUrl = req.file.path; // Path of the uploaded track
+        const trackUrl = req.file.path.replace('uploads', ''); // Path of the uploaded track
 
         // Create a new track document in the database
         const newTrack = new Track({

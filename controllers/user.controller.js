@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user'); // Assuming the User schema is in models folder
+const User = require('../models/user.js'); // Assuming the User schema is in models folder
+const Track = require('../models/track..model.js');
+const Playlist = require('../models/playlist.js');
 
 // Controller function for user registration
 exports.registerUser = async (req, res) => {
@@ -89,15 +91,74 @@ exports.loginUser = async (req, res) => {
 // Controller function for getting user profile
 exports.getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).select('-password'); // Exclude password
+        const user = await User.findById(req.user._id)
+            .select('-password')
+            .populate({
+                path: 'favorites',
+                model: Track,
+                populate: {
+                    path: 'artist',
+                    model: User,
+                    select: 'username'
+                }
+            })
+            .populate('playlists');
+
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-        res.json(user);
+
+        res.render('profile', { user: user });
     } catch (error) {
-
         console.log(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
 
+// Controller function to add track to favorites
+exports.addToFavorites = async (req, res) => {
+    try {
+        const trackId = req.params.trackId;
+        const userId = req.user.id; // Assuming authMiddleware adds user to req
+
+        // Check if the track exists
+        const track = await Track.findById(trackId);
+        if (!track) {
+            return res.status(404).json({ message: 'Track not found' });
+        }
+
+        // Add the track to user's favorites if not already present
+        const user = await User.findById(userId);
+        if (!user.favorites.includes(trackId)) {
+            user.favorites.push(trackId);
+            await user.save();
+        }
+        res.redirect(`/track/${trackId}`);
+    } catch (error) {
+        console.error('Error adding track to favorites:', error);
+        res.status(500).json({ message: 'Error adding track to favorites' });
+    }
+};
+
+// Controller function to create playlists
+exports.createPlaylist = async (req, res) => {
+    try {
+        const { playlistName } = req.body;
+        const userId = req.user._id;
+
+        const newPlaylist = new Playlist({
+            title: playlistName,
+            user: userId,
+            tracks: []
+        });
+
+        await newPlaylist.save();
+
+        await User.findByIdAndUpdate(userId, { $push: { playlists: newPlaylist._id } });
+
+        res.redirect('/user/profile');
+    } catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Server error' });
     }
 };

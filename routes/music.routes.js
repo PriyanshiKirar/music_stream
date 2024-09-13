@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { uploadTrack } = require('../controllers/music.controller.js');
-const authMiddleware = require('../middleware/auth');
+const authMiddleware = require('../middleware/auth.js');
 const artistCheckMiddleware = require('../middleware/artistCheck.js');
 const multer = require('multer');
 

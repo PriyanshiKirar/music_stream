@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Music App - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col">
+    <header class="bg-indigo-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Music App</h1>
+            <nav>
+                <% if (user) { %>
+                <a
+                    href="/user/profile"
+                    class="text-lg hover:text-indigo-200"
+                >Hello, <%= user.username %></a>
+                <% } else { %>
+                <a
+                    href="/user/login"
+                    class="text-white hover:text-indigo-200 mr-4"
+                >Login</a>
+                <a
+                    href="/user/register"
+                    class="bg-white text-indigo-600 px-4 py-2 rounded hover:bg-indigo-100"
+                >Register</a>
+                <% } %>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <section class="recent-tracks">
+            <h2 class="text-3xl font-bold mb-6">Recent Tracks</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <% recentTracks.forEach(track => { %>
+                <div
+                    class="track-card bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
+                    <img
+                        src="<%= track.poster || '/images/defaultPoster.jpg' %>"
+                        alt="<%= track.title %> poster"
+                        class="w-full h-48 object-cover"
+                    >
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold mb-2"><%= track.title %></h3>
+                        <p class="text-gray-600 mb-4">Artist: <%= track.artist.username %></p>
+                        <a
+                            href="/track/<%= track._id %>"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors"
+                        >Listen</a>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-4 mt-auto">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2023 Music App. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
